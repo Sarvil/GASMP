@@ -57,6 +57,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* Ability1Action;
 
+	void JumpPressed();
+	void JumpReleased();
 	void Ability1Pressed();
 	void Ability1Released();
 
