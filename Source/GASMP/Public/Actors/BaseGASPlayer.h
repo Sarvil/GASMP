@@ -55,8 +55,10 @@ public:
 	UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* Ability1;
+	UInputAction* Ability1Action;
 
+	void Ability1Pressed();
+	void Ability1Released();
 
 protected:
 
@@ -105,8 +107,7 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
-	void Ability1Pressed();
-	void Ability1Released();
+	
 	
 	// Creates and initializes the floating status bar for heroes.
 	// Safe to call many times because it checks to make sure it only executes once.

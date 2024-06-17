@@ -19,6 +19,7 @@
 
 ABaseGASPlayer::ABaseGASPlayer()
 {
+	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(FName("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bUsePawnControlRotation = true;
@@ -54,6 +55,7 @@ ABaseGASPlayer::ABaseGASPlayer()
 
 void ABaseGASPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	// Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -62,7 +64,7 @@ void ABaseGASPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	BindASCInput();
+	//BindASCInput();
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
@@ -75,10 +77,11 @@ void ABaseGASPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABaseGASPlayer::Look);
-		if(Ability1)
+
+		if(Ability1Action)
 		{
-			EnhancedInputComponent->BindAction(Ability1, ETriggerEvent::Triggered, this, &ABaseGASPlayer::Ability1Pressed);
-			EnhancedInputComponent->BindAction(Ability1, ETriggerEvent::Completed, this, &ABaseGASPlayer::Ability1Released);
+			EnhancedInputComponent->BindAction(Ability1Action, ETriggerEvent::Started, this, &ABaseGASPlayer::Ability1Pressed);
+			EnhancedInputComponent->BindAction(Ability1Action, ETriggerEvent::Completed, this, &ABaseGASPlayer::Ability1Released);
 		}
 	}
 }
@@ -208,7 +211,7 @@ void ABaseGASPlayer::OnRep_PlayerState()
         AbilitySystemComponent = Cast<UActorGASComponent>(PS->GetAbilitySystemComponent());
         PS->GetAbilitySystemComponent()->InitAbilityActorInfo(PS, this);
 		// Bind player input to the AbilitySystemComponent. Also called in SetupPlayerInputComponent because of a potential race condition.
-		BindASCInput();
+		//BindASCInput();
 
 		// Set the BaseAttributeSet for convenience attribute functions
 		BaseAttributeSet = PS->GetBaseAttributeSet();
