@@ -1,0 +1,15 @@
+/.DS_Store
+/.ignore
+/.vscode
+/Binaries
+/Build
+/Content
+/DerivedDataCache
+/GASMP (Mac).code-workspace
+/GASMP.code-workspace
+/GASMP.uproject
+/Intermediate
+/Saved
+/Plugins/MultiplayerSessions/Binaries
+/Plugins/MultiplayerSessions/Content
+/Plugins/MultiplayerSessions/Intermediate
