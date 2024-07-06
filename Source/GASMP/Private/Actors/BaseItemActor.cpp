@@ -57,7 +57,7 @@ void ABaseItemActor::OnDropped()
 	if(AActor* ActorOwner = GetOwner())
 	{
 		const FVector Location = GetActorLocation();
-		const FVector Forward = ActorOwner->GetActorForwardVector();
+		const FVector Forward = saActorOwner->GetActorForwardVector();
 		const float DropItemDist = 100.0f;
 		const float DropItemTraceDist = 1000.0f;
 		const FVector TraceStart = Location + Forward * DropItemDist;
@@ -68,13 +68,14 @@ void ABaseItemActor::OnDropped()
 		const bool bShowInventory = CVar->GetInt() > 0;
 		FVector TargetLocation = TraceEnd;
 		EDrawDebugTrace::Type DebugDrawType = bShowInventory ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None;
-		if(UKismetSystemLibrary::LineTraceSingleByProfile(this, TraceStart, TraceEnd, TEXT("worldstatic"), true, ActorsToIgnore, DebugDrawType, TraceHit, true))
+		if (UKismetSystemLibrary::LineTraceSingleByProfile(this, TraceStart, TraceEnd, TEXT("WorldStatic"), true, ActorsToIgnore, DebugDrawType, TraceHit, true))
 		{
-			if(TraceHit.bBlockingHit)
+			if (TraceHit.bBlockingHit)
 			{
 				TargetLocation = TraceHit.Location;
 			}
 		}
+
 		SetActorLocation(TargetLocation);
 		SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		SphereComponent->SetGenerateOverlapEvents(true);

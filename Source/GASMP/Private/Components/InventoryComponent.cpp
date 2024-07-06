@@ -167,7 +167,7 @@ void UInventoryComponent::DropItem()
 	{
 		if(IsValid(CurrentItem))
 		{
-			CurrentItem->OnUnEquipped();
+			CurrentItem->OnDropped();
 			RemoveItem(CurrentItem->ItemStaticDataClass);
 			CurrentItem = nullptr;
 		}
