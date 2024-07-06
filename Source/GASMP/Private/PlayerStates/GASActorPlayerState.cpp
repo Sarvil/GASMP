@@ -94,6 +94,11 @@ float AGASActorPlayerState::GetMoveSpeed() const
     return BaseAttributeSet->GetMoveSpeed();
 }
 
+UInventoryComponent *AGASActorPlayerState::GetInventoryComponent() const
+{
+    return InventoryComponent;
+}
+
 void AGASActorPlayerState::BeginPlay()
 {
     Super::BeginPlay();

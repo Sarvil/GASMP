@@ -8,6 +8,7 @@
 #include "AttributeSets/BaseAttributeSet.h"
 #include "Abilities/BaseGameplayAbility.h"
 #include "GameplayEffect.h"
+#include "../../GASMPTypes.h"
 #include "BaseGASCharacter.generated.h"
 
 UCLASS()
@@ -18,6 +19,10 @@ class GASMP_API ABaseGASCharacter : public ACharacter, public IAbilitySystemInte
 public:
 	// Sets default values for this character's properties
 	ABaseGASCharacter(const class FObjectInitializer& ObjectInitializer);
+
+	virtual void PostInitializeComponents() override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	// Implement IAbilitySystemInterface
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -51,6 +56,14 @@ public:
 	// Removes all CharacterAbilities. Can only be called by the Server. Removing on the Server will remove from Client too.
 	virtual void RemoveCharacterAbilities();
 
+	UFUNCTION(BlueprintCallable)
+	FCharacterData GetCharacterData() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetCharacterData(const FCharacterData& InCharacterData);
+
+	class UFootstepsComponent* GetFootstepsComponent() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -65,31 +78,27 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Character")
 	UAnimMontage* DeathMontage;
 
-	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TArray<TSubclassOf<class UBaseGameplayAbility>> CharacterAbilities;
-
-	// Default attributes for a character for initializing on spawn/respawn.
-	// This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TSubclassOf<class UGameplayEffect> DefaultAttributes;
-
-	// These effects are only applied one time on startup
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
-
 	// Grant abilities on the Server. The Ability Specs will be replicated to the owning client.
 	virtual void AddCharacterAbilities();
-
-	// Initialize the Character's attributes. Must run on Server but we run it on Client too
-	// so that we don't have to wait. The Server's replication to the Client won't matter since
-	// the values should be the same.
-	virtual void InitializeAttributes();
 
 	virtual void AddStartupEffects();
 
 	virtual void SetHealth(float Health);
 	virtual void SetMana(float Mana);
 	virtual void SetStamina(float Stamina);
+
+	UPROPERTY(ReplicatedUsing = OnRep_CharacterData)
+	FCharacterData CharacterData;
+
+	UFUNCTION()
+	void OnRep_CharacterData();
+
+	virtual void InitFromCharacterData(const FCharacterData& InCharacterData, bool bFromReplication = false);
+
+	UPROPERTY(EditDefaultsOnly)
+	class UCharacterDataAsset* CharacterDataAsset;
+
+	UPROPERTY(BlueprintReadOnly)
+	class UFootstepsComponent* FootstepsComponent;
 
 };

@@ -4,6 +4,42 @@
 #include "GASMPTypes.generated.h"
 
 class ABaseItemActor;
+class UBaseGameplayAbility;
+
+USTRUCT(BlueprintType)
+struct FCharacterData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "GAS")
+    TArray<TSubclassOf<class UGameplayEffect>> Effects;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "GAS")
+    TArray<TSubclassOf<class UBaseGameplayAbility>> Abilities;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Animation")
+    class UCharacterAnimDataAsset* CharacterAnimDataAsset;
+
+};
+
+UENUM(BlueprintType)
+enum class EFoot : uint8
+{
+    Left UMETA(DisplayName = "Left"),
+    Right UMETA(DisplayName = "Right")
+};
+
+USTRUCT(BlueprintType)
+struct FCharacterAnimationData
+{
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditDefaultsOnly)
+    class UBlendSpace* UnEquippedMovementBlendSpace = nullptr;
+
+    UPROPERTY(EditDefaultsOnly)
+    class UAnimSequenceBase* UnEquippedIdleAnimation = nullptr;
+};
 
 UCLASS(BlueprintType, Blueprintable)
 class UItemStaticData : public UObject

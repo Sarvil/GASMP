@@ -60,6 +60,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	float GetMoveSpeed() const;
 
+	UInventoryComponent* GetInventoryComponent() const;
+
 protected:
 
 	virtual void BeginPlay() override;

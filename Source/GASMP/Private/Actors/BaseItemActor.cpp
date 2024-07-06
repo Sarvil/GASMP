@@ -57,7 +57,7 @@ void ABaseItemActor::OnDropped()
 	if(AActor* ActorOwner = GetOwner())
 	{
 		const FVector Location = GetActorLocation();
-		const FVector Forward = saActorOwner->GetActorForwardVector();
+		const FVector Forward = ActorOwner->GetActorForwardVector();
 		const float DropItemDist = 100.0f;
 		const float DropItemTraceDist = 1000.0f;
 		const FVector TraceStart = Location + Forward * DropItemDist;

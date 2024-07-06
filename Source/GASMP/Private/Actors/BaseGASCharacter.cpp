@@ -7,6 +7,9 @@
 #include "Abilities/BaseGameplayAbility.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/GASCharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "DataAssets/CharacterDataAsset.h"
+#include "Components/FootstepsComponent.h"
 
 // Sets default values
 ABaseGASCharacter::ABaseGASCharacter(const class FObjectInitializer& ObjectInitializer) : 
@@ -18,7 +21,26 @@ ABaseGASCharacter::ABaseGASCharacter(const class FObjectInitializer& ObjectIniti
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Overlap);
 
 	bAlwaysRelevant = true;
+
+	FootstepsComponent = CreateDefaultSubobject<UFootstepsComponent>(TEXT("FootstepsComponent"));
 }
+
+void ABaseGASCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if(IsValid(CharacterDataAsset))
+	{
+		SetCharacterData(CharacterDataAsset->CharacterData);
+	}
+}
+
+void ABaseGASCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABaseGASCharacter, CharacterData);
+} 
 
 // Called when the game starts or when spawned
 void ABaseGASCharacter::BeginPlay()
@@ -35,37 +57,13 @@ void ABaseGASCharacter::AddCharacterAbilities()
 		return;
 	}
 
-	for (TSubclassOf<UBaseGameplayAbility>& StartupAbility : CharacterAbilities)
+	for (TSubclassOf<UBaseGameplayAbility>& StartupAbility : CharacterData.Abilities)
 	{
 		AbilitySystemComponent->GiveAbility(
 			FGameplayAbilitySpec(StartupAbility, 1, static_cast<int32>(StartupAbility.GetDefaultObject()->AbilityInputID), this));
 	}
 
 	AbilitySystemComponent->bCharacterAbilitiesGiven = true;
-}
-
-void ABaseGASCharacter::InitializeAttributes()
-{
-	if (!AbilitySystemComponent.IsValid())
-	{
-		return;
-	}
-
-	if (!DefaultAttributes)
-	{
-		UE_LOG(LogTemp, Error, TEXT("%s() Missing DefaultAttributes for %s. Please fill in the character's Blueprint."), *FString(__FUNCTION__), *GetName());
-		return;
-	}
-
-	// Can run on Server and Client
-	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddSourceObject(this);
-
-	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributes, 1, EffectContext);
-	if (NewHandle.IsValid())
-	{
-		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
-	}
 }
 
 void ABaseGASCharacter::AddStartupEffects()
@@ -78,7 +76,7 @@ void ABaseGASCharacter::AddStartupEffects()
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	for (TSubclassOf<UGameplayEffect> GameplayEffect : StartupEffects)
+	for (TSubclassOf<UGameplayEffect> GameplayEffect : CharacterData.Effects)
 	{
 		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
 		if (NewHandle.IsValid())
@@ -112,6 +110,15 @@ void ABaseGASCharacter::SetStamina(float Stamina)
 	{
 		BaseAttributeSet->SetStamina(Stamina);
 	}
+}
+
+void ABaseGASCharacter::OnRep_CharacterData()
+{
+	InitFromCharacterData(CharacterData, true);
+}
+
+void ABaseGASCharacter::InitFromCharacterData(const FCharacterData &InCharacterData, bool bFromReplication)
+{
 }
 
 UAbilitySystemComponent *ABaseGASCharacter::GetAbilitySystemComponent() const
@@ -210,7 +217,7 @@ void ABaseGASCharacter::RemoveCharacterAbilities()
 	TArray<FGameplayAbilitySpecHandle> AbilitiesToRemove;
 	for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities())
 	{
-		if ((Spec.SourceObject == this) && CharacterAbilities.Contains(Spec.Ability->GetClass()))
+		if ((Spec.SourceObject == this) && CharacterData.Abilities.Contains(Spec.Ability->GetClass()))
 		{
 			AbilitiesToRemove.Add(Spec.Handle);
 		}
@@ -223,4 +230,21 @@ void ABaseGASCharacter::RemoveCharacterAbilities()
 	}
 
 	AbilitySystemComponent->bCharacterAbilitiesGiven = false;
+}
+
+FCharacterData ABaseGASCharacter::GetCharacterData() const
+{
+    return CharacterData;
+}
+
+void ABaseGASCharacter::SetCharacterData(const FCharacterData &InCharacterData)
+{
+	CharacterData = InCharacterData;
+
+	InitFromCharacterData(CharacterData);
+}
+
+UFootstepsComponent *ABaseGASCharacter::GetFootstepsComponent() const
+{
+    return FootstepsComponent;
 }

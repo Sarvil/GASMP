@@ -219,10 +219,6 @@ void ABaseGASPlayer::PossessedBy(AController *NewController)
 		// Set the BaseAttributeSet for convenience attribute functions
 		BaseAttributeSet = PS->GetBaseAttributeSet();
 
-		// If we handle players disconnecting and rejoining in the future, we'll have to change this so that possession from rejoining doesn't reset attributes.
-		// For now assume possession = spawn/respawn.
-		InitializeAttributes();
-
 
 		// Set Health/Mana/Stamina to their max. This is only necessary for *Respawn*.
 		SetHealth(GetMaxHealth());
@@ -264,10 +260,6 @@ void ABaseGASPlayer::OnRep_PlayerState()
 
 		// Set the BaseAttributeSet for convenience attribute functions
 		BaseAttributeSet = PS->GetBaseAttributeSet();
-
-		// If we handle players disconnecting and rejoining in the future, we'll have to change this so that posession from rejoining doesn't reset attributes.
-		// For now assume possession = spawn/respawn.
-		InitializeAttributes();
 
 		AGASPlayerController* PC = Cast<AGASPlayerController>(GetController());
 		if (PC)

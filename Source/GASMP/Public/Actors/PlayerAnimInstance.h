@@ -19,10 +19,27 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaTime) override; 
 
+protected:
+
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	class UBlendSpace* GetUnEquippedLocomotion() const;
+
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	class UAnimSequenceBase* GetUnEquippedIdleAnimation() const;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Animation")
+    class UCharacterAnimDataAsset* DefaultCharacterAnimDataAsset;
+
 private:
 
 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
 	class ABaseGASCharacter* GASCharacter;
+
+	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
+	float Forward;
+
+	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
+	float Side;
 
 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
 	float Speed;

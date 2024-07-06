@@ -5,19 +5,19 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "../../GASMPTypes.h"
-#include "CharacterAnimDataAsset.generated.h"
+#include "CharacterDataAsset.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class GASMP_API UCharacterAnimDataAsset : public UDataAsset
+UCLASS(BlueprintType, Blueprintable)
+class GASMP_API UCharacterDataAsset : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
 
 	UPROPERTY(EditDefaultsOnly)
-	FCharacterAnimationData CharacterAnimationData;
+	FCharacterData CharacterData;
 	
 };
