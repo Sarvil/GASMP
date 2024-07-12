@@ -4,6 +4,8 @@
 #include "Abilities/GameplayAbility_Jump.h"
 #include "GASMP/GASMP.h"
 #include "Actors/BaseGASCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 UGameplayAbility_Jump::UGameplayAbility_Jump()
 {
@@ -22,7 +24,20 @@ void UGameplayAbility_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Han
 		}
 
 		ACharacter * Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
-		Character->Jump();
+
+		UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Character);
+		const bool bIsWallrunning = ASC && ASC->HasMatchingGameplayTag(WallrunStateTag);
+		if(bIsWallrunning)
+		{
+			FGameplayTagContainer WallRunTags(WallrunStateTag);
+			ASC->CancelAbilities(&WallRunTags);
+			FVector JumpOffVector = Character->GetCharacterMovement()->GetCurrentAcceleration().GetSafeNormal() + FVector::UpVector;
+			Character->LaunchCharacter(JumpOffVector * OffWallJumpStrength, true, true);
+		}
+		else
+		{
+			Character->Jump();
+		}
 	}
 }
 
@@ -33,8 +48,13 @@ bool UGameplayAbility_Jump::CanActivateAbility(const FGameplayAbilitySpecHandle 
 		return false;
 	}
 
-	const ABaseGASCharacter* Character = CastChecked<ABaseGASCharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
-	return Character && Character->CanJump();
+	ABaseGASCharacter* Character = CastChecked<ABaseGASCharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
+
+	const bool bMovementAllowsJump = Character->GetMovementComponent()->IsJumpAllowed();
+	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Character);
+	const bool bIsWallrunning = ASC && ASC->HasMatchingGameplayTag(WallrunStateTag);
+
+	return Character && Character->CanJump() || (bMovementAllowsJump && bIsWallrunning);
 }
 
 void UGameplayAbility_Jump::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)

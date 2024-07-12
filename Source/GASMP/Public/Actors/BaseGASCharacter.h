@@ -11,6 +11,9 @@
 #include "../../GASMPTypes.h"
 #include "BaseGASCharacter.generated.h"
 
+class UGAS_MotionWarpingComponent;
+class UGASCharacterMovementComponent;
+
 UCLASS()
 class GASMP_API ABaseGASCharacter : public ACharacter, public IAbilitySystemInterface
 {
@@ -53,6 +56,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	float GetMoveSpeedBaseValue() const;
 
+	// Applies a gameplay effect to the character's ability system component
+	bool ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> Effect, FGameplayEffectContextHandle InEffectContext);
+
 	// Removes all CharacterAbilities. Can only be called by the Server. Removing on the Server will remove from Client too.
 	virtual void RemoveCharacterAbilities();
 
@@ -63,6 +69,8 @@ public:
 	void SetCharacterData(const FCharacterData& InCharacterData);
 
 	class UFootstepsComponent* GetFootstepsComponent() const;
+
+	class UGAS_MotionWarpingComponent* GetMotionWarpingComponent() const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -100,5 +108,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	class UFootstepsComponent* FootstepsComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MotionWarp")
+	UGAS_MotionWarpingComponent* MotionWarpingComponent;
+
+	UGASCharacterMovementComponent* GASCharacterMovementComponent;
 
 };

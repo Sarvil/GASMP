@@ -19,6 +19,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/InventoryComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Components/GASCharacterMovementComponent.h"
 
 ABaseGASPlayer::ABaseGASPlayer(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -32,7 +33,7 @@ ABaseGASPlayer::ABaseGASPlayer(const class FObjectInitializer& ObjectInitializer
 	FollowCamera->FieldOfView = 80.0f;
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
-
+	
 	// Makes sure that the animations play on the Server so that we can use bone and socket transforms
 	// to do things like spawning projectiles and other FX.
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
@@ -152,11 +153,10 @@ void ABaseGASPlayer::Look(const FInputActionValue& Value)
 
 void ABaseGASPlayer::JumpPressed()
 {
-	if(GEngine)
+	if(!GASCharacterMovementComponent->TryTraversal(AbilitySystemComponent.Get()))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Hello1")));
+		SendLocalInputToASC(true, EGASAbilityInputID::Jump);
 	}
-	SendLocalInputToASC(true, EGASAbilityInputID::Jump);
 }
 
 void ABaseGASPlayer::JumpReleased()

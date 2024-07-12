@@ -4,6 +4,7 @@
 #include "Actors/PlayerAnimInstance.h"
 #include "Actors/BaseGASCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AbilitySystemComponent.h"
 #include "GASMP/GASMPTypes.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Animation/BlendSpace.h"
@@ -34,6 +35,10 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
     bIsInAir = GASCharacter->GetCharacterMovement()->IsFalling();
     bIsAccelerating = GASCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
+    /*FGameplayTag WallRunTag = FGameplayTag::RequestGameplayTag(FName("State.Movement.WallRun"));
+    FGameplayTag WallRunDirectionTag = FGameplayTag::RequestGameplayTag(FName("State.Movement.WallRun.Right"));
+    bIsWallRunning = GASPlayerState->GetAbilitySystemComponent()->HasMatchingGameplayTag(WallRunTag);
+    bMirrorWallRun = GASPlayerState->GetAbilitySystemComponent()->HasMatchingGameplayTag(WallRunDirectionTag); */
 }
 
 UBlendSpace *UPlayerAnimInstance::GetUnEquippedLocomotion() const

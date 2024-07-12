@@ -3,6 +3,7 @@
 
 #include "Abilities/BaseGameplayAbility.h"
 #include "AbilitySystemComponent.h"
+#include "Actors/BaseGASCharacter.h"
 
 UBaseGameplayAbility::UBaseGameplayAbility()
 {
@@ -18,4 +19,8 @@ void UBaseGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo *ActorInf
 	{
 		ActorInfo->AbilitySystemComponent->TryActivateAbility(Spec.Handle, false);
 	}
+}
+ABaseGASCharacter *UBaseGameplayAbility::GetActionGameCharacterFromActorInfo() const
+{
+    return Cast<ABaseGASCharacter>(GetAvatarActorFromActorInfo());
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "GameplayTagContainer.h"
 #include "PlayerAnimInstance.generated.h"
 
 /**
@@ -35,6 +36,9 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
 	class ABaseGASCharacter* GASCharacter;
 
+	/* UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
+	class AGASActorPlayerState* GASPlayerState; */
+
 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
 	float Forward;
 
@@ -49,4 +53,10 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
 	bool bIsAccelerating;
+
+/* 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
+	bool bIsWallRunning;
+
+	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
+	bool bMirrorWallRun; */
 };

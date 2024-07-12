@@ -10,9 +10,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "BaseGameplayAbility.generated.h"
 
-/**
- * 
- */
+class ABaseGASCharacter;
+
 UCLASS()
 class GASMP_API UBaseGameplayAbility : public UGameplayAbility
 {
@@ -38,4 +37,9 @@ public:
 	// If an ability is marked as 'ActivateAbilityOnGranted', activate them immediately when given here
 	// Epic's comment: Projects may want to initiate passives or do other "BeginPlay" type of logic here.
 	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+
+protected:
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ABaseGASCharacter* GetActionGameCharacterFromActorInfo() const;
 };

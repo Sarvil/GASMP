@@ -7,6 +7,7 @@
 #include "Abilities/BaseGameplayAbility.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/GASCharacterMovementComponent.h"
+#include "Components/GAS_MotionWarpingComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "DataAssets/CharacterDataAsset.h"
 #include "Components/FootstepsComponent.h"
@@ -23,6 +24,10 @@ ABaseGASCharacter::ABaseGASCharacter(const class FObjectInitializer& ObjectIniti
 	bAlwaysRelevant = true;
 
 	FootstepsComponent = CreateDefaultSubobject<UFootstepsComponent>(TEXT("FootstepsComponent"));
+
+	MotionWarpingComponent = CreateDefaultSubobject<UGAS_MotionWarpingComponent>(TEXT("MotionWarpingComponent"));
+
+	GASCharacterMovementComponent = Cast<UGASCharacterMovementComponent>(GetCharacterMovement());
 }
 
 void ABaseGASCharacter::PostInitializeComponents()
@@ -206,6 +211,21 @@ float ABaseGASCharacter::GetMoveSpeedBaseValue() const
 	return 0.0f;
 }
 
+bool ABaseGASCharacter::ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> Effect, FGameplayEffectContextHandle InEffectContext)
+{
+    if (!Effect.Get()) return false;
+
+	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, 1, InEffectContext);
+
+	if (SpecHandle.IsValid())
+	{
+		
+		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		return ActiveGEHandle.WasSuccessfullyApplied();
+		
+	}
+	return false;
+}
 void ABaseGASCharacter::RemoveCharacterAbilities()
 {
 	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || !AbilitySystemComponent->bCharacterAbilitiesGiven)
@@ -247,4 +267,9 @@ void ABaseGASCharacter::SetCharacterData(const FCharacterData &InCharacterData)
 UFootstepsComponent *ABaseGASCharacter::GetFootstepsComponent() const
 {
     return FootstepsComponent;
+}
+
+UGAS_MotionWarpingComponent *ABaseGASCharacter::GetMotionWarpingComponent() const
+{
+    return MotionWarpingComponent;
 }
