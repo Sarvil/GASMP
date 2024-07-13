@@ -95,6 +95,11 @@ void ABaseGASPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		{
 			EnhancedInputComponent->BindAction(UnEquipAction, ETriggerEvent::Started, this, &ABaseGASPlayer::UnEquipPressed);
 		}
+		if(AttackAction)
+		{
+			EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ABaseGASPlayer::AttackPressed);
+			EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Completed, this, &ABaseGASPlayer::AttackReleased);
+		}
 	}
 }
 
@@ -205,6 +210,28 @@ void ABaseGASPlayer::UnEquipPressed(const FInputActionValue& Value)
 	if(PS)
 	{
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::UnEquipTag, EventPayload);
+	}
+}
+
+void ABaseGASPlayer::AttackPressed(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = AttackStartedEventTag;
+	AGASActorPlayerState* PS = GetPlayerState<AGASActorPlayerState>();
+	if(PS)
+	{
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, AttackStartedEventTag, EventPayload);
+	}
+}
+
+void ABaseGASPlayer::AttackReleased(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = AttackEndedEventTag;
+	AGASActorPlayerState* PS = GetPlayerState<AGASActorPlayerState>();
+	if(PS)
+	{
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, AttackEndedEventTag, EventPayload);
 	}
 }
 

@@ -65,6 +65,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* UnEquipAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AttackAction;
+
 protected:
 
 	virtual void OnRep_PlayerState() override;
@@ -116,6 +119,16 @@ protected:
 	void DropItemPressed(const FInputActionValue& Value);
 	void EquipNextPressed(const FInputActionValue& Value);
 	void UnEquipPressed(const FInputActionValue& Value);
+	void AttackPressed(const FInputActionValue& Value);
+	void AttackReleased(const FInputActionValue& Value);
+
+	//GameplayTags
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag AttackStartedEventTag;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag AttackEndedEventTag;
 	
 	// Creates and initializes the floating status bar for heroes.
 	// Safe to call many times because it checks to make sure it only executes once.

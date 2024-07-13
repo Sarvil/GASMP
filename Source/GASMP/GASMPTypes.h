@@ -5,6 +5,9 @@
 
 class ABaseItemActor;
 class UBaseGameplayAbility;
+class UGameplayAbility;
+class UGameplayEffect;
+class UAnimMontage;
 
 USTRUCT(BlueprintType)
 struct FCharacterData
@@ -63,8 +66,31 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FCharacterAnimationData CharacterAnimationData;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TArray<TSubclassOf<UGameplayAbility>> GrantedAbilities;
+
 protected:
 
+};
+
+UCLASS(BlueprintType, Blueprintable)
+class UWeaponStaticData : public UItemStaticData
+{
+    GENERATED_BODY()
+    
+public:
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    TSubclassOf<UGameplayEffect> DamageEffect;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    USkeletalMesh* SkeletalMesh;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UStaticMesh* StaticMesh;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+    UAnimMontage* AttackMontage;
 };
 
 UENUM(BlueprintType)

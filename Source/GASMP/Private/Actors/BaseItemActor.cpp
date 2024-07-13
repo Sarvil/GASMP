@@ -85,6 +85,7 @@ void ABaseItemActor::OnDropped()
 void ABaseItemActor::Init(UInventoryItemInstance *InInstance)
 {
 	ItemInstance = InInstance;
+	InitInternal();
 } 
 
 // Called when the game starts or when spawned
@@ -99,7 +100,16 @@ void ABaseItemActor::BeginPlay()
 			ItemInstance->Init(ItemStaticDataClass);
 			SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			SphereComponent->SetGenerateOverlapEvents(true);
+			InitInternal();
 		}
+	}
+}
+
+void ABaseItemActor::OnRep_ItemInstance(UInventoryItemInstance* OldItemInstance)
+{
+	if(IsValid(ItemInstance) && !IsValid(OldItemInstance))
+	{
+		InitInternal();
 	}
 }
 
@@ -128,6 +138,10 @@ void ABaseItemActor::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, A
 		EventPayload.EventTag = UInventoryComponent::EquipItemActorTag;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OtherActor, UInventoryComponent::EquipItemActorTag, EventPayload);
 	}
+}
+
+void ABaseItemActor::InitInternal()
+{
 }
 
 // Called every frame

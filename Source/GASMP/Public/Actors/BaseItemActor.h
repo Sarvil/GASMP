@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "../../GASMPTypes.h"
 #include "GameplayTagContainer.h"
+#include "Abilities/GameplayAbilityTypes.h"
 #include "BaseItemActor.generated.h"
 
 class UInventoryItemInstance; 
@@ -33,11 +34,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_ItemInstance)
 	UInventoryItemInstance* ItemInstance = nullptr;
 
 	UPROPERTY(ReplicatedUsing = OnRep_ItemState)
 	EItemState ItemState = EItemState::None;
+
+	UFUNCTION()
+	void OnRep_ItemInstance(UInventoryItemInstance* OldItemInstance);
 
 	UFUNCTION()
 	void OnRep_ItemState();
@@ -48,8 +52,10 @@ protected:
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<UItemStaticData> ItemStaticDataClass;
+
+	virtual void InitInternal();
 
 public:	
 	// Called every frame

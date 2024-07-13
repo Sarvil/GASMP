@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "../../GASMPTypes.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "InventoryItemInstance.generated.h"
 
-/**
- * 
- */
+class ABaseItemActor;
+
 UCLASS(BlueprintType, Blueprintable)
 class GASMP_API UInventoryItemInstance : public UObject
 {
@@ -36,11 +36,20 @@ public:
 	void OnRep_Equipped();
 
 	virtual void OnEquipped(AActor* InOwner = nullptr);
-	virtual void OnUnEquipped();
-	virtual void OnDropped();
+	virtual void OnUnEquipped(AActor* InOwner = nullptr);
+	virtual void OnDropped(AActor* InOwner = nullptr);
+
+	UFUNCTION(BlueprintPure)
+	ABaseItemActor* GetItemActor() const;
 
 protected:
 
 	UPROPERTY(Replicated)
 	ABaseItemActor* ItemActor;
+
+	void TryGrantAbilities(AActor* InOwner);
+	void TryRemoveAbilities(AActor* InOwner);
+
+	UPROPERTY()
+	TArray<FGameplayAbilitySpecHandle> GrantedAbilityHandles;
 };

@@ -155,7 +155,9 @@ void UInventoryComponent::UnEquipItem()
 	{
 		if(IsValid(CurrentItem))
 		{
-			CurrentItem->OnUnEquipped();
+			APlayerState* OwnedState = Cast<APlayerState>(GetOwner());
+			AActor* OwnedActor = Cast<AActor>(OwnedState->GetPawn());
+			CurrentItem->OnUnEquipped(OwnedActor);
 			CurrentItem = nullptr;
 		}
 	}
@@ -167,7 +169,9 @@ void UInventoryComponent::DropItem()
 	{
 		if(IsValid(CurrentItem))
 		{
-			CurrentItem->OnDropped();
+			APlayerState* OwnedState = Cast<APlayerState>(GetOwner());
+			AActor* OwnedActor = Cast<AActor>(OwnedState->GetPawn());
+			CurrentItem->OnDropped(OwnedActor);
 			RemoveItem(CurrentItem->ItemStaticDataClass);
 			CurrentItem = nullptr;
 		}
