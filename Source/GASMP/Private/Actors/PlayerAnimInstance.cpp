@@ -10,6 +10,9 @@
 #include "Animation/BlendSpace.h"
 #include "DataAssets/CharacterAnimDataAsset.h"
 #include "DataAssets/CharacterDataAsset.h"
+#include "Components/InventoryComponent.h"
+#include "Inventory/InventoryItemInstance.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 void UPlayerAnimInstance::NativeInitializeAnimation()
 {
@@ -39,12 +42,29 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
     FGameplayTag WallRunDirectionTag = FGameplayTag::RequestGameplayTag(FName("State.Movement.WallRun.Right"));
     bIsWallRunning = GASPlayerState->GetAbilitySystemComponent()->HasMatchingGameplayTag(WallRunTag);
     bMirrorWallRun = GASPlayerState->GetAbilitySystemComponent()->HasMatchingGameplayTag(WallRunDirectionTag); */
+    UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GASCharacter);
+	bIsWallRunning = ASC && ASC->HasMatchingGameplayTag(WallrunStateTag);
+	bMirrorWallRun = ASC && ASC->HasMatchingGameplayTag(WallrunRightStateTag);
+}
+
+const UItemStaticData *UPlayerAnimInstance::GetItemEquippedData() const
+{
+    UInventoryComponent* InventoryComponent = GASCharacter ? GASCharacter->GetInventoryComponent() : nullptr;
+    UInventoryItemInstance* ItemInstance = InventoryComponent ? InventoryComponent->GetEquippedItem() : nullptr;
+    return ItemInstance ? ItemInstance->GetItemStaticData() : nullptr;
 }
 
 UBlendSpace *UPlayerAnimInstance::GetUnEquippedLocomotion() const
 {
     if(GASCharacter)
     {
+        if(const UItemStaticData* ItemData = GetItemEquippedData())
+        {
+            if(ItemData->CharacterAnimationData.UnEquippedMovementBlendSpace)
+            {
+                return ItemData->CharacterAnimationData.UnEquippedMovementBlendSpace;
+            }
+        }
         FCharacterData Data = GASCharacter->GetCharacterData();
         if(Data.CharacterAnimDataAsset)
         {
@@ -58,6 +78,13 @@ UAnimSequenceBase *UPlayerAnimInstance::GetUnEquippedIdleAnimation() const
 {
     if(GASCharacter)
     {
+        if(const UItemStaticData* ItemData = GetItemEquippedData())
+        {
+            if(ItemData->CharacterAnimationData.UnEquippedIdleAnimation)
+            {
+                return ItemData->CharacterAnimationData.UnEquippedIdleAnimation;
+            }
+        }
         FCharacterData Data = GASCharacter->GetCharacterData();
         if(Data.CharacterAnimDataAsset)
         {

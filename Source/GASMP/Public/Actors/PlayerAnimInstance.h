@@ -7,9 +7,8 @@
 #include "GameplayTagContainer.h"
 #include "PlayerAnimInstance.generated.h"
 
-/**
- * 
- */
+class UItemStaticData;
+
 UCLASS()
 class GASMP_API UPlayerAnimInstance : public UAnimInstance
 {
@@ -21,6 +20,14 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaTime) override; 
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag WallrunStateTag;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag WallrunRightStateTag;
+
+	const UItemStaticData* GetItemEquippedData() const;
 
 	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
 	class UBlendSpace* GetUnEquippedLocomotion() const;
@@ -54,9 +61,9 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
 	bool bIsAccelerating;
 
-/* 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
+ 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
 	bool bIsWallRunning;
 
 	UPROPERTY(BlueprintReadOnly, Category="Character", meta = (AllowPrivateAccess = "true"))
-	bool bMirrorWallRun; */
+	bool bMirrorWallRun;
 };

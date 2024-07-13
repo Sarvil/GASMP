@@ -13,6 +13,7 @@
 
 class UGAS_MotionWarpingComponent;
 class UGASCharacterMovementComponent;
+class UInventoryComponent;
 
 UCLASS()
 class GASMP_API ABaseGASCharacter : public ACharacter, public IAbilitySystemInterface
@@ -71,6 +72,8 @@ public:
 	class UFootstepsComponent* GetFootstepsComponent() const;
 
 	class UGAS_MotionWarpingComponent* GetMotionWarpingComponent() const;
+
+	class UInventoryComponent* GetInventoryComponent() const;
 
 protected:
 	// Called when the game starts or when spawned

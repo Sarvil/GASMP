@@ -96,7 +96,7 @@ float AGASActorPlayerState::GetMoveSpeed() const
 
 UInventoryComponent *AGASActorPlayerState::GetInventoryComponent() const
 {
-    return InventoryComponent;
+    return InventoryComponent ? InventoryComponent : nullptr;
 }
 
 void AGASActorPlayerState::BeginPlay()

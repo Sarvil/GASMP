@@ -11,6 +11,7 @@
 #include "Net/UnrealNetwork.h"
 #include "DataAssets/CharacterDataAsset.h"
 #include "Components/FootstepsComponent.h"
+#include "PlayerStates/GASActorPlayerState.h"
 
 // Sets default values
 ABaseGASCharacter::ABaseGASCharacter(const class FObjectInitializer& ObjectInitializer) : 
@@ -272,4 +273,18 @@ UFootstepsComponent *ABaseGASCharacter::GetFootstepsComponent() const
 UGAS_MotionWarpingComponent *ABaseGASCharacter::GetMotionWarpingComponent() const
 {
     return MotionWarpingComponent;
+}
+
+UInventoryComponent *ABaseGASCharacter::GetInventoryComponent() const
+{
+	AGASActorPlayerState* GASPlayerState = Cast<AGASActorPlayerState>(GetPlayerState());
+	if(GASPlayerState)
+	{
+		UInventoryComponent* InventoryComponent = GASPlayerState->GetInventoryComponent();
+		if(InventoryComponent)
+		{
+			return InventoryComponent;
+		}
+	}
+    return nullptr;
 }
