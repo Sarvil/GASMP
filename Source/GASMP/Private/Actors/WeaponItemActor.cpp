@@ -4,6 +4,9 @@
 #include "Actors/WeaponItemActor.h"
 #include "Inventory/InventoryItemInstance.h"
 #include "GASMPTypes.h"
+#include "PhysicalMaterials/BasePhysicalMaterial.h"
+#include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 
 AWeaponItemActor::AWeaponItemActor()
 {
@@ -17,8 +20,47 @@ const UWeaponStaticData *AWeaponItemActor::GetWeaponStaticData() const
 
 FVector AWeaponItemActor::GetMuzzleLocation() const
 {
-    return MeshComponent ? MeshComponent->GetSocketLocation(TEXT("Muzzle")) : GetActorLocation();
+    return MeshComponent ? MeshComponent->GetSocketLocation(TEXT("MuzzleFlash")) : GetActorLocation();
 }
+
+void AWeaponItemActor::PlayWeaponEffects(const FHitResult &InHitResult)
+{
+    if(HasAuthority())
+    {
+        MulticastPlayWeaponEffects(InHitResult);
+    }
+    else
+    {
+        PlayWeaponEffectsInternal(InHitResult);
+    }
+}
+
+void AWeaponItemActor::MulticastPlayWeaponEffects_Implementation(const FHitResult &InHitResult)
+{
+    if(!Owner || Owner->GetLocalRole() != ROLE_AutonomousProxy)
+    {
+        PlayWeaponEffectsInternal(InHitResult);
+    }
+}
+
+void AWeaponItemActor::PlayWeaponEffectsInternal(const FHitResult &InHitResult)
+{
+    if(InHitResult.PhysMaterial.Get())
+    {
+        UBasePhysicalMaterial* PhysicalMaterial = Cast<UBasePhysicalMaterial>(InHitResult.PhysMaterial.Get());
+        if(PhysicalMaterial)
+        {
+            UGameplayStatics::PlaySoundAtLocation(this, PhysicalMaterial->PointImpactSound, InHitResult.ImpactPoint, 1.0f);
+            UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PhysicalMaterial->PointImpactVFX, InHitResult.ImpactPoint);
+            UGameplayStatics::SpawnEmitterAtLocation(this, PhysicalMaterial->PointImpactCVFX, InHitResult.ImpactPoint, FRotator::ZeroRotator, true);
+        }
+        if(const UWeaponStaticData* WeaponData = GetWeaponStaticData())
+        {
+            UGameplayStatics::PlaySoundAtLocation(this, WeaponData->AttackSound, GetActorLocation(), 1.0f);
+        }
+    }
+}
+
 void AWeaponItemActor::InitInternal()
 {
     Super::InitInternal();

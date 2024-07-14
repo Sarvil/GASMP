@@ -31,9 +31,9 @@ ABaseGASCharacter::ABaseGASCharacter(const class FObjectInitializer& ObjectIniti
 	GASCharacterMovementComponent = Cast<UGASCharacterMovementComponent>(GetCharacterMovement());
 }
 
-void ABaseGASCharacter::PostInitializeComponents()
+void ABaseGASCharacter::PostLoad()
 {
-	Super::PostInitializeComponents();
+	Super::PostLoad();
 
 	if(IsValid(CharacterDataAsset))
 	{

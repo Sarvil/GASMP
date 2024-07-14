@@ -24,7 +24,7 @@ public:
 	// Sets default values for this character's properties
 	ABaseGASCharacter(const class FObjectInitializer& ObjectInitializer);
 
-	virtual void PostInitializeComponents() override;
+	virtual void PostLoad() override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
