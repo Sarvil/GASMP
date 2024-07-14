@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "../../GASMPTypes.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "GameplayEffectTypes.h"
 #include "InventoryItemInstance.generated.h"
 
 class ABaseItemActor;
@@ -49,7 +50,14 @@ protected:
 
 	void TryGrantAbilities(AActor* InOwner);
 	void TryRemoveAbilities(AActor* InOwner);
+	void TryApplyEffects(AActor* InOwner);
+	void TryRemoveEffects(AActor* InOwner);
 
 	UPROPERTY()
 	TArray<FGameplayAbilitySpecHandle> GrantedAbilityHandles;
+
+	TArray<FActiveGameplayEffectHandle> OngoingEffectHandles;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TArray<TSubclassOf<UGameplayEffect>> OngoingEffects;
 };

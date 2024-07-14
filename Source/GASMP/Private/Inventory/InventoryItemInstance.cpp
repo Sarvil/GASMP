@@ -61,6 +61,7 @@ void UInventoryItemInstance::OnEquipped(AActor* InOwner)
         }
     }
     TryGrantAbilities(InOwner);
+    TryApplyEffects(InOwner);
     bEquipped = true;
 }
 
@@ -72,6 +73,7 @@ void UInventoryItemInstance::OnUnEquipped(AActor* InOwner)
         ItemActor = nullptr;
      }
     TryRemoveAbilities(InOwner);
+    TryRemoveEffects(InOwner);
     bEquipped = false;
 }
 
@@ -82,6 +84,7 @@ void UInventoryItemInstance::OnDropped(AActor* InOwner)
         ItemActor->OnDropped();
     }
     TryRemoveAbilities(InOwner);
+    TryRemoveEffects(InOwner);
     bEquipped = false;
 }
 
@@ -119,4 +122,45 @@ void UInventoryItemInstance::TryRemoveAbilities(AActor *InOwner)
             GrantedAbilityHandles.Empty();
         }
     }
+}
+
+void UInventoryItemInstance::TryApplyEffects(AActor *InOwner)
+{
+    if(UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InOwner))
+    {
+        const UItemStaticData* ItemStaticData = GetItemStaticData();
+        FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+        for(auto GameplayEffect : ItemStaticData->OngoingEffects)
+        {
+            if(!GameplayEffect.Get()) continue;
+            FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(GameplayEffect, 1, EffectContext);
+            if(SpecHandle.IsValid())
+            {
+                FActiveGameplayEffectHandle ActiveGEHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+                if(!ActiveGEHandle.WasSuccessfullyApplied())
+                {
+                    
+                }
+                else
+                {
+                    OngoingEffectHandles.Add(ActiveGEHandle);
+                }
+            }
+        }
+    }
+}
+
+void UInventoryItemInstance::TryRemoveEffects(AActor *InOwner)
+{
+    if(UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InOwner))
+    {
+        for(FActiveGameplayEffectHandle ActiveEffectHandle : OngoingEffectHandles)
+        {
+            if(ActiveEffectHandle.IsValid())
+            {
+                ASC->RemoveActiveGameplayEffect(ActiveEffectHandle);
+            }
+        }
+    }
+    OngoingEffectHandles.Empty();
 }
