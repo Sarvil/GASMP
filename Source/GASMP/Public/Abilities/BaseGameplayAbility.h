@@ -21,6 +21,11 @@ public:
 
 	UBaseGameplayAbility();
 
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+
+
 	// Abilities with this set will automatically activate when the input is pressed
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability")
 	EGASAbilityInputID AbilityInputID = EGASAbilityInputID::None;
@@ -42,4 +47,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ABaseGASCharacter* GetActionGameCharacterFromActorInfo() const;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TArray<TSubclassOf<UGameplayEffect>> OngoingEffectsToRemoveOnEnd;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TArray<TSubclassOf<UGameplayEffect>> OngoingEffectsToJustApplyOnStart;
+
+	TArray<FActiveGameplayEffectHandle> RemoveOnEndEffectHandles;
 };
