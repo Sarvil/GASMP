@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Abilities/BaseGameplayAbility.h"
 #include "Actors/AIProjectile.h"
+#include "Actors/BaseGASPlayer.h"
+#include "Actors/BaseAICharacter.h"
 #include "AIGameplayAbility_Attack.generated.h"
 
 /**
@@ -30,7 +32,7 @@ protected:
     void MoveTowardsPlayer(ACharacter* BossCharacter, ACharacter* PlayerCharacter);
 
     // Helper function to shoot a projectile towards the player
-    void ShootProjectile(ACharacter* BossCharacter, ACharacter* PlayerCharacter);
+    void ShootProjectile(const FGameplayAbilityActorInfo *ActorInfo);
 
     // Projectile class to spawn
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
