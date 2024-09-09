@@ -22,7 +22,7 @@ void UAIGameplayAbility_Attack::ActivateAbility(const FGameplayAbilitySpecHandle
     if (BossCharacter && PlayerCharacter)
     {
         // Move the boss towards the player
-        // MoveTowardsPlayer(BossCharacter, PlayerCharacter);
+        MoveTowardsPlayer(BossCharacter, PlayerCharacter);
 
         // After moving, shoot the projectile
         // ShootProjectile(ActorInfo);

@@ -20,9 +20,13 @@
 #include "Components/InventoryComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Components/GASCharacterMovementComponent.h"
+#include "UI/GASHUD.h"
 
 ABaseGASPlayer::ABaseGASPlayer(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = true;
+    CrosshairSpread = 0.0f;
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(FName("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bUsePawnControlRotation = true;
@@ -299,6 +303,31 @@ void ABaseGASPlayer::PossessedBy(AController *NewController)
 UGASFloatingStatusBarWidget *ABaseGASPlayer::GetFloatingStatusBar()
 {
     return UIFloatingStatusBar;;
+}
+
+void ABaseGASPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+    AGASPlayerController* PC = Cast<AGASPlayerController>(GetController());
+    if (PC)
+    {
+        AGASHUD* HUD = Cast<AGASHUD>(PC->GetHUD());
+        if (HUD)
+        {
+            // Example logic to increase spread when moving
+            if (GetVelocity().Size() > 0.0f)
+            {
+                CrosshairSpread = FMath::FInterpTo(CrosshairSpread, 50.0f, DeltaTime, 5.0f);
+            }
+            else
+            {
+                CrosshairSpread = FMath::FInterpTo(CrosshairSpread, 0.0f, DeltaTime, 5.0f);
+            }
+
+            HUD->UpdateCrosshairSpread(CrosshairSpread);
+        }
+    }
 }
 
 void ABaseGASPlayer::OnRep_PlayerState()

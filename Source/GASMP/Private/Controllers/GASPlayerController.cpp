@@ -3,6 +3,7 @@
 
 #include "Controllers/GASPlayerController.h"
 #include "PlayerStates/GASActorPlayerState.h"
+#include "UI/GASHUD.h"
 
 void AGASPlayerController::CreateHUD()
 {
@@ -51,6 +52,22 @@ void AGASPlayerController::CreateHUD()
 UGASHUDWidget *AGASPlayerController::GetHUD()
 {
     return UIHUDWidget;
+}
+
+void AGASPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+    // Set the HUD class to our custom one
+    if (GetHUD())
+    {
+        AGASHUD* HUD = Cast<AGASHUD>(GetHUD());
+        if (HUD)
+        {
+            // Initial setup for crosshair
+            HUD->UpdateCrosshairSpread(0.0f);
+        }
+    }
 }
 
 void AGASPlayerController::OnPossess(APawn *InPawn)

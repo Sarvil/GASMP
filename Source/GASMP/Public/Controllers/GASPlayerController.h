@@ -24,6 +24,8 @@ public:
 
 	class UGASHUDWidget* GetHUD();
 
+	virtual void BeginPlay() override;
+
 protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "GASDocumentation|UI")
