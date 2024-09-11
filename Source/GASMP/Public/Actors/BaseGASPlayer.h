@@ -71,6 +71,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ADSAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SprintAction;
+
 	virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -128,6 +131,8 @@ protected:
 	void AttackReleased(const FInputActionValue& Value);
 	void ADSPressed(const FInputActionValue& Value);
 	void ADSReleased(const FInputActionValue& Value);
+	void SprintPressed(const FInputActionValue& Value);
+	void SprintReleased(const FInputActionValue& Value);
 
 	//GameplayTags------------------------------
 
@@ -142,6 +147,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTag ADSEndedEventTag;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag SprintStartedEventTag;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag SprintEndedEventTag;
 
 	//GameplayTags------------------------------
 	

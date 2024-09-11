@@ -47,7 +47,7 @@ void UBaseGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 					FActiveGameplayEffectHandle ActiveGEHandle = AbilityComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 					if (!ActiveGEHandle.WasSuccessfullyApplied())
 					{
-						UE_LOG(LogTemp, Error, TEXT("Failed to apply jump effect! %s"), *GetNameSafe(GameplayEffect));
+						UE_LOG(LogTemp, Error, TEXT("Failed to apply effect! %s"), *GetNameSafe(GameplayEffect));
 					}
 					else
 					{
@@ -65,11 +65,13 @@ void UBaseGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, c
 	{
 		if (ActiveEffectHandle.IsValid())
 		{
+			UE_LOG(LogTemp, Error, TEXT("Fuck %d"), RemoveOnEndEffectHandles.Num());
 			ActorInfo->AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveEffectHandle);
 		}
-		RemoveOnEndEffectHandles.Empty();
-
 	}
+	
+	RemoveOnEndEffectHandles.Empty();
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 

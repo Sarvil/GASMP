@@ -109,6 +109,11 @@ void ABaseGASPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 			EnhancedInputComponent->BindAction(ADSAction, ETriggerEvent::Started, this, &ABaseGASPlayer::ADSPressed);
 			EnhancedInputComponent->BindAction(ADSAction, ETriggerEvent::Completed, this, &ABaseGASPlayer::ADSReleased);
 		}
+		if(SprintAction)
+		{
+			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ABaseGASPlayer::SprintPressed);
+			EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ABaseGASPlayer::SprintReleased);
+		}
 	}
 }
 
@@ -264,6 +269,16 @@ void ABaseGASPlayer::ADSReleased(const FInputActionValue &Value)
 	{
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, ADSEndedEventTag, EventPayload);
 	}
+}
+
+void ABaseGASPlayer::SprintPressed(const FInputActionValue &Value)
+{
+	SendLocalInputToASC(true, EGASAbilityInputID::Sprint);
+}
+
+void ABaseGASPlayer::SprintReleased(const FInputActionValue &Value)
+{
+	SendLocalInputToASC(false, EGASAbilityInputID::Sprint);
 }
 
 void ABaseGASPlayer::PossessedBy(AController *NewController)

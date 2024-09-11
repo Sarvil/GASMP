@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "PlayerStates/GASActorPlayerState.h"
 #include "Actors/BaseGASPlayer.h"
 #include "Controllers/GASPlayerController.h"
@@ -8,13 +7,15 @@
 #include "Components/InventoryComponent.h"
 #include "UI/GASHUDWidget.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AGASActorPlayerState::AGASActorPlayerState()
 {
-    NetUpdateFrequency = 100.0f;
-    AbilitySystemComponent = CreateDefaultSubobject<UActorGASComponent>(TEXT("AbilitySystemComponent"));
-    AbilitySystemComponent->SetIsReplicated(true);
-    // Mixed mode means we only are replicated the GEs to ourself, not the GEs to simulated proxies. If another GDPlayerState (Hero) receives a GE,
+	NetUpdateFrequency = 100.0f;
+	AbilitySystemComponent = CreateDefaultSubobject<UActorGASComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	// Mixed mode means we only are replicated the GEs to ourself, not the GEs to simulated proxies. If another GDPlayerState (Hero) receives a GE,
 	// we won't be told about it by the Server. Attributes, GameplayTags, and GameplayCues will still replicate to us.
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
@@ -27,14 +28,14 @@ AGASActorPlayerState::AGASActorPlayerState()
 	InventoryComponent->SetIsReplicated(true);
 }
 
-UAbilitySystemComponent* AGASActorPlayerState::GetAbilitySystemComponent() const
+UAbilitySystemComponent *AGASActorPlayerState::GetAbilitySystemComponent() const
 {
-    return AbilitySystemComponent;
+	return AbilitySystemComponent;
 }
 
 UBaseAttributeSet *AGASActorPlayerState::GetBaseAttributeSet() const
 {
-    return BaseAttributeSet;
+	return BaseAttributeSet;
 }
 
 void AGASActorPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> &OutLifetimeProps) const
@@ -46,64 +47,64 @@ void AGASActorPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> 
 
 float AGASActorPlayerState::GetHealth() const
 {
-    return BaseAttributeSet->GetHealth();
+	return BaseAttributeSet->GetHealth();
 }
 
 float AGASActorPlayerState::GetMaxHealth() const
 {
-    return BaseAttributeSet->GetMaxHealth();
+	return BaseAttributeSet->GetMaxHealth();
 }
 
 float AGASActorPlayerState::GetHealthRegenRate() const
 {
-    return BaseAttributeSet->GetHealthRegenRate();
+	return BaseAttributeSet->GetHealthRegenRate();
 }
 
 float AGASActorPlayerState::GetMana() const
 {
-    return BaseAttributeSet->GetMana();
+	return BaseAttributeSet->GetMana();
 }
 
 float AGASActorPlayerState::GetMaxMana() const
 {
-    return BaseAttributeSet->GetMaxMana();
+	return BaseAttributeSet->GetMaxMana();
 }
 
 float AGASActorPlayerState::GetManaRegenRate() const
 {
-    return BaseAttributeSet->GetManaRegenRate();
+	return BaseAttributeSet->GetManaRegenRate();
 }
 
 float AGASActorPlayerState::GetStamina() const
 {
-    return BaseAttributeSet->GetStamina();
+	return BaseAttributeSet->GetStamina();
 }
 
 float AGASActorPlayerState::GetMaxStamina() const
 {
-    return BaseAttributeSet->GetMaxStamina();
+	return BaseAttributeSet->GetMaxStamina();
 }
 
 float AGASActorPlayerState::GetStaminaRegenRate() const
 {
-    return BaseAttributeSet->GetStaminaRegenRate();
+	return BaseAttributeSet->GetStaminaRegenRate();
 }
 
 float AGASActorPlayerState::GetMoveSpeed() const
 {
-    return BaseAttributeSet->GetMoveSpeed();
+	return BaseAttributeSet->GetMoveSpeed();
 }
 
 UInventoryComponent *AGASActorPlayerState::GetInventoryComponent() const
 {
-    return InventoryComponent ? InventoryComponent : nullptr;
+	return InventoryComponent ? InventoryComponent : nullptr;
 }
 
 void AGASActorPlayerState::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    if (AbilitySystemComponent)
+	if (AbilitySystemComponent)
 	{
 		// Attribute change callbacks
 		HealthChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetHealthAttribute()).AddUObject(this, &AGASActorPlayerState::HealthChanged);
@@ -115,18 +116,19 @@ void AGASActorPlayerState::BeginPlay()
 		StaminaChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetStaminaAttribute()).AddUObject(this, &AGASActorPlayerState::StaminaChanged);
 		MaxStaminaChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetMaxStaminaAttribute()).AddUObject(this, &AGASActorPlayerState::MaxStaminaChanged);
 		StaminaRegenRateChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetStaminaRegenRateAttribute()).AddUObject(this, &AGASActorPlayerState::StaminaRegenRateChanged);
+		MoveSpeedChangedDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetMoveSpeedAttribute()).AddUObject(this, &AGASActorPlayerState::MoveSpeedChanged);
 	}
 }
 
 void AGASActorPlayerState::HealthChanged(const FOnAttributeChangeData &Data)
 {
-    float Health = Data.NewValue;
+	float Health = Data.NewValue;
 
 	// Update floating status bar
-	ABaseGASPlayer* Hero = Cast<ABaseGASPlayer>(GetPawn());
+	ABaseGASPlayer *Hero = Cast<ABaseGASPlayer>(GetPawn());
 	if (Hero)
 	{
-		UGASFloatingStatusBarWidget* HeroFloatingStatusBar = Hero->GetFloatingStatusBar();
+		UGASFloatingStatusBarWidget *HeroFloatingStatusBar = Hero->GetFloatingStatusBar();
 		if (HeroFloatingStatusBar)
 		{
 			HeroFloatingStatusBar->SetHealthPercentage(Health / GetMaxHealth());
@@ -136,23 +138,23 @@ void AGASActorPlayerState::HealthChanged(const FOnAttributeChangeData &Data)
 
 void AGASActorPlayerState::MaxHealthChanged(const FOnAttributeChangeData &Data)
 {
-    float MaxHealth = Data.NewValue;
+	float MaxHealth = Data.NewValue;
 
 	// Update floating status bar
-	ABaseGASPlayer* Hero = Cast<ABaseGASPlayer>(GetPawn());
+	ABaseGASPlayer *Hero = Cast<ABaseGASPlayer>(GetPawn());
 	if (Hero)
 	{
-		UGASFloatingStatusBarWidget* HeroFloatingStatusBar = Hero->GetFloatingStatusBar();
+		UGASFloatingStatusBarWidget *HeroFloatingStatusBar = Hero->GetFloatingStatusBar();
 		if (HeroFloatingStatusBar)
 		{
 			HeroFloatingStatusBar->SetHealthPercentage(GetHealth() / MaxHealth);
 		}
 	}
-    // Update the HUD
-	AGASPlayerController* PC = Cast<AGASPlayerController>(GetOwner());
+	// Update the HUD
+	AGASPlayerController *PC = Cast<AGASPlayerController>(GetOwner());
 	if (PC)
 	{
-		UGASHUDWidget* HUD = PC->GetHUD();
+		UGASHUDWidget *HUD = PC->GetHUD();
 		if (HUD)
 		{
 			HUD->SetMaxHealth(MaxHealth);
@@ -162,13 +164,13 @@ void AGASActorPlayerState::MaxHealthChanged(const FOnAttributeChangeData &Data)
 
 void AGASActorPlayerState::HealthRegenRateChanged(const FOnAttributeChangeData &Data)
 {
-    float HealthRegenRate = Data.NewValue;
+	float HealthRegenRate = Data.NewValue;
 
 	// Update the HUD
-	AGASPlayerController* PC = Cast<AGASPlayerController>(GetOwner());
+	AGASPlayerController *PC = Cast<AGASPlayerController>(GetOwner());
 	if (PC)
 	{
-		UGASHUDWidget* HUD = PC->GetHUD();
+		UGASHUDWidget *HUD = PC->GetHUD();
 		if (HUD)
 		{
 			HUD->SetHealthRegenRate(HealthRegenRate);
@@ -178,13 +180,13 @@ void AGASActorPlayerState::HealthRegenRateChanged(const FOnAttributeChangeData &
 
 void AGASActorPlayerState::ManaChanged(const FOnAttributeChangeData &Data)
 {
-    float Mana = Data.NewValue;
+	float Mana = Data.NewValue;
 
 	// Update floating status bar
-	ABaseGASPlayer* Hero = Cast<ABaseGASPlayer>(GetPawn());
+	ABaseGASPlayer *Hero = Cast<ABaseGASPlayer>(GetPawn());
 	if (Hero)
 	{
-		UGASFloatingStatusBarWidget* HeroFloatingStatusBar = Hero->GetFloatingStatusBar();
+		UGASFloatingStatusBarWidget *HeroFloatingStatusBar = Hero->GetFloatingStatusBar();
 		if (HeroFloatingStatusBar)
 		{
 			HeroFloatingStatusBar->SetManaPercentage(Mana / GetMaxMana());
@@ -194,13 +196,13 @@ void AGASActorPlayerState::ManaChanged(const FOnAttributeChangeData &Data)
 
 void AGASActorPlayerState::MaxManaChanged(const FOnAttributeChangeData &Data)
 {
-    float MaxMana = Data.NewValue;
+	float MaxMana = Data.NewValue;
 
 	// Update floating status bar
-	ABaseGASPlayer* Hero = Cast<ABaseGASPlayer>(GetPawn());
+	ABaseGASPlayer *Hero = Cast<ABaseGASPlayer>(GetPawn());
 	if (Hero)
 	{
-		UGASFloatingStatusBarWidget* HeroFloatingStatusBar = Hero->GetFloatingStatusBar();
+		UGASFloatingStatusBarWidget *HeroFloatingStatusBar = Hero->GetFloatingStatusBar();
 		if (HeroFloatingStatusBar)
 		{
 			HeroFloatingStatusBar->SetManaPercentage(GetMana() / MaxMana);
@@ -208,10 +210,10 @@ void AGASActorPlayerState::MaxManaChanged(const FOnAttributeChangeData &Data)
 	}
 
 	// Update the HUD
-	AGASPlayerController* PC = Cast<AGASPlayerController>(GetOwner());
+	AGASPlayerController *PC = Cast<AGASPlayerController>(GetOwner());
 	if (PC)
 	{
-		UGASHUDWidget* HUD = PC->GetHUD();
+		UGASHUDWidget *HUD = PC->GetHUD();
 		if (HUD)
 		{
 			HUD->SetMaxMana(MaxMana);
@@ -221,13 +223,13 @@ void AGASActorPlayerState::MaxManaChanged(const FOnAttributeChangeData &Data)
 
 void AGASActorPlayerState::ManaRegenRateChanged(const FOnAttributeChangeData &Data)
 {
-    float ManaRegenRate = Data.NewValue;
+	float ManaRegenRate = Data.NewValue;
 
 	// Update the HUD
-	AGASPlayerController* PC = Cast<AGASPlayerController>(GetOwner());
+	AGASPlayerController *PC = Cast<AGASPlayerController>(GetOwner());
 	if (PC)
 	{
-		UGASHUDWidget* HUD = PC->GetHUD();
+		UGASHUDWidget *HUD = PC->GetHUD();
 		if (HUD)
 		{
 			HUD->SetManaRegenRate(ManaRegenRate);
@@ -237,7 +239,7 @@ void AGASActorPlayerState::ManaRegenRateChanged(const FOnAttributeChangeData &Da
 
 void AGASActorPlayerState::StaminaChanged(const FOnAttributeChangeData &Data)
 {
-    float Stamina = Data.NewValue;
+	float Stamina = Data.NewValue;
 
 	// Update the HUD
 	// Handled in the UI itself using the AsyncTaskAttributeChanged node as an example how to do it in Blueprint
@@ -245,13 +247,13 @@ void AGASActorPlayerState::StaminaChanged(const FOnAttributeChangeData &Data)
 
 void AGASActorPlayerState::MaxStaminaChanged(const FOnAttributeChangeData &Data)
 {
-    float MaxStamina = Data.NewValue;
+	float MaxStamina = Data.NewValue;
 
 	// Update the HUD
-	AGASPlayerController* PC = Cast<AGASPlayerController>(GetOwner());
+	AGASPlayerController *PC = Cast<AGASPlayerController>(GetOwner());
 	if (PC)
 	{
-		UGASHUDWidget* HUD = PC->GetHUD();
+		UGASHUDWidget *HUD = PC->GetHUD();
 		if (HUD)
 		{
 			HUD->SetMaxStamina(MaxStamina);
@@ -261,16 +263,30 @@ void AGASActorPlayerState::MaxStaminaChanged(const FOnAttributeChangeData &Data)
 
 void AGASActorPlayerState::StaminaRegenRateChanged(const FOnAttributeChangeData &Data)
 {
-    float StaminaRegenRate = Data.NewValue;
+	float StaminaRegenRate = Data.NewValue;
 
 	// Update the HUD
-	AGASPlayerController* PC = Cast<AGASPlayerController>(GetOwner());
+	AGASPlayerController *PC = Cast<AGASPlayerController>(GetOwner());
 	if (PC)
 	{
-		UGASHUDWidget* HUD = PC->GetHUD();
+		UGASHUDWidget *HUD = PC->GetHUD();
 		if (HUD)
 		{
 			HUD->SetStaminaRegenRate(StaminaRegenRate);
 		}
+	}
+}
+void AGASActorPlayerState::MoveSpeedChanged(const FOnAttributeChangeData &Data)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0, FColor::Green, TEXT("Activated"));
+	}
+	float MewMoveSpeed = Data.NewValue;
+	ACharacter *OwningCharacter = Cast<ACharacter>(GetPawn());
+	UCharacterMovementComponent *CharacterMovement = OwningCharacter ? OwningCharacter->GetCharacterMovement() : nullptr;
+	if (CharacterMovement)
+	{
+		CharacterMovement->MaxWalkSpeed = MewMoveSpeed;
 	}
 }

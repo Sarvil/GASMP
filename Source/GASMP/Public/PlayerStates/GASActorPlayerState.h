@@ -81,6 +81,7 @@ protected:
 	FDelegateHandle StaminaChangedDelegateHandle;
 	FDelegateHandle MaxStaminaChangedDelegateHandle;
 	FDelegateHandle StaminaRegenRateChangedDelegateHandle;
+	FDelegateHandle MoveSpeedChangedDelegateHandle;
 
 	virtual void HealthChanged(const FOnAttributeChangeData& Data);
 	virtual void MaxHealthChanged(const FOnAttributeChangeData& Data);
@@ -91,6 +92,7 @@ protected:
 	virtual void StaminaChanged(const FOnAttributeChangeData& Data);
 	virtual void MaxStaminaChanged(const FOnAttributeChangeData& Data);
 	virtual void StaminaRegenRateChanged(const FOnAttributeChangeData& Data);
+	virtual void MoveSpeedChanged(const FOnAttributeChangeData& Data);
 
 	//Inventory
 	UPROPERTY(EditAnywhere, Replicated)

@@ -28,8 +28,7 @@ void UAIGameplayAbility_Attack::ActivateAbility(const FGameplayAbilitySpecHandle
         // ShootProjectile(ActorInfo);
         if (ProjectileClass)
         {
-            //FVector MuzzleLocation = BossCharacter->GetMesh()->GetSocketLocation("RifleSocket"); // Assuming you have a socket named "Muzzle_01"
-            FVector MuzzleLocation = BossCharacter->GetActorLocation(); // Assuming you have a socket named "Muzzle_01"
+            FVector MuzzleLocation = BossCharacter->GetMesh()->GetSocketLocation("RifleSocket");
             FRotator MuzzleRotation = (PlayerCharacter->GetActorLocation() - MuzzleLocation).Rotation();
 
             FActorSpawnParameters SpawnParams;
